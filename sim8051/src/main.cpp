@@ -162,11 +162,11 @@ int main() {
         ImGui::DockSpaceOverViewport();
 
         ImGui::Begin( "Control" );
-        ImGui::Text( String( "Cycle count: " + to_string( processor->cycle_count ) +
+        ImGui::Text( "%s", String( "Cycle count: " + to_string( processor->cycle_count ) +
                              ( steps_per_frame == 0 ? " (Paused)" : "" ) )
                          .c_str() );
-        ImGui::Text( String( "Cycles per frame: " + to_string( steps_per_frame ) ).c_str() );
-        ImGui::Text( String( "Frames per second: " + to_string( 1.f / delta_time.asSeconds() ) ).c_str() );
+        ImGui::Text( "%s", String( "Cycles per frame: " + to_string( steps_per_frame ) ).c_str() );
+        ImGui::Text( "%s", String( "Frames per second: " + to_string( 1.f / delta_time.asSeconds() ) ).c_str() );
         if ( ImGui::Button( steps_per_frame != 0 ? "Pause" : "Run" ) ) {
             steps_per_frame = steps_per_frame == 0 ? 1 : 0;
             max_speed = false;
@@ -221,8 +221,8 @@ int main() {
         ImGui::End();
 
         ImGui::Begin( "Special function registers" );
-        ImGui::Text( String( "PSW  = " + int_to_ui_string( processor->direct_acc( 0xD0 ) ) ).c_str() );
-        ImGui::Text( String( "  C=" + String( processor->is_bit_set( 0xD7 ) ? "1" : "0" ) +
+        ImGui::Text( "%s", String( "PSW  = " + int_to_ui_string( processor->direct_acc( 0xD0 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "  C=" + String( processor->is_bit_set( 0xD7 ) ? "1" : "0" ) +
                              ", AC=" + ( processor->is_bit_set( 0xD6 ) ? "1" : "0" ) +
                              ", F0=" + ( processor->is_bit_set( 0xD5 ) ? "1" : "0" ) +
                              ", RS1=" + ( processor->is_bit_set( 0xD4 ) ? "1" : "0" ) +
@@ -231,43 +231,43 @@ int main() {
                              ", UD=" + ( processor->is_bit_set( 0xD1 ) ? "1" : "0" ) +
                              ", P=" + ( processor->is_bit_set( 0xD0 ) ? "1" : "0" ) )
                          .c_str() );
-        ImGui::Text( String( "A    = " + int_to_ui_string( processor->direct_acc( 0xE0 ) ) ).c_str() );
-        ImGui::Text( String( "B    = " + int_to_ui_string( processor->direct_acc( 0xF0 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "A    = " + int_to_ui_string( processor->direct_acc( 0xE0 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "B    = " + int_to_ui_string( processor->direct_acc( 0xF0 ) ) ).c_str() );
         u16 dptr_value = ( static_cast<u16>( processor->direct_acc( 0x83 ) ) << 8 ) + processor->direct_acc( 0x82 );
-        ImGui::Text( String( "DPTR = " + int_to_ui_string( dptr_value, 16 ) ).c_str() );
-        ImGui::Text( String( "SP   = " + int_to_ui_string( processor->direct_acc( 0x81 ) ) ).c_str() );
-        ImGui::Text( String( "PC   = " + int_to_ui_string( processor->pc, 16 ) ).c_str() );
+        ImGui::Text( "%s", String( "DPTR = " + int_to_ui_string( dptr_value, 16 ) ).c_str() );
+        ImGui::Text( "%s", String( "SP   = " + int_to_ui_string( processor->direct_acc( 0x81 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "PC   = " + int_to_ui_string( processor->pc, 16 ) ).c_str() );
 
         ImGui::Spacing();
         auto bank_nr = ( processor->direct_acc( 0xD0 ) & 0x18 ) >> 3;
         auto *r0_ptr = &processor->iram[8 * bank_nr];
-        ImGui::Text( String( "R0   = " + int_to_ui_string( *r0_ptr ) ).c_str() );
-        ImGui::Text( String( "R1   = " + int_to_ui_string( *( r0_ptr + 1 ) ) ).c_str() );
-        ImGui::Text( String( "R2   = " + int_to_ui_string( *( r0_ptr + 2 ) ) ).c_str() );
-        ImGui::Text( String( "R3   = " + int_to_ui_string( *( r0_ptr + 3 ) ) ).c_str() );
-        ImGui::Text( String( "R4   = " + int_to_ui_string( *( r0_ptr + 4 ) ) ).c_str() );
-        ImGui::Text( String( "R5   = " + int_to_ui_string( *( r0_ptr + 5 ) ) ).c_str() );
-        ImGui::Text( String( "R6   = " + int_to_ui_string( *( r0_ptr + 6 ) ) ).c_str() );
-        ImGui::Text( String( "R7   = " + int_to_ui_string( *( r0_ptr + 7 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "R0   = " + int_to_ui_string( *r0_ptr ) ).c_str() );
+        ImGui::Text( "%s", String( "R1   = " + int_to_ui_string( *( r0_ptr + 1 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "R2   = " + int_to_ui_string( *( r0_ptr + 2 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "R3   = " + int_to_ui_string( *( r0_ptr + 3 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "R4   = " + int_to_ui_string( *( r0_ptr + 4 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "R5   = " + int_to_ui_string( *( r0_ptr + 5 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "R6   = " + int_to_ui_string( *( r0_ptr + 6 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "R7   = " + int_to_ui_string( *( r0_ptr + 7 ) ) ).c_str() );
 
         ImGui::Spacing();
-        ImGui::Text( String( "P0   = " + int_to_ui_string( processor->direct_acc( 0x80 ) ) ).c_str() );
-        ImGui::Text( String( "P1   = " + int_to_ui_string( processor->direct_acc( 0x90 ) ) ).c_str() );
-        ImGui::Text( String( "P2   = " + int_to_ui_string( processor->direct_acc( 0xA0 ) ) ).c_str() );
-        ImGui::Text( String( "P3   = " + int_to_ui_string( processor->direct_acc( 0xB0 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "P0   = " + int_to_ui_string( processor->direct_acc( 0x80 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "P1   = " + int_to_ui_string( processor->direct_acc( 0x90 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "P2   = " + int_to_ui_string( processor->direct_acc( 0xA0 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "P3   = " + int_to_ui_string( processor->direct_acc( 0xB0 ) ) ).c_str() );
 
         ImGui::Spacing();
-        ImGui::Text( String( "PCON = " + int_to_ui_string( processor->direct_acc( 0x87 ) ) ).c_str() );
-        ImGui::Text( String( "IE   = " + int_to_ui_string( processor->direct_acc( 0xA8 ) ) ).c_str() );
-        ImGui::Text( String( "IP   = " + int_to_ui_string( processor->direct_acc( 0xB8 ) ) ).c_str() );
-        ImGui::Text( String( "TCON = " + int_to_ui_string( processor->direct_acc( 0x88 ) ) ).c_str() );
-        ImGui::Text( String( "TMOD = " + int_to_ui_string( processor->direct_acc( 0x89 ) ) ).c_str() );
-        ImGui::Text( String( "TH0  = " + int_to_ui_string( processor->direct_acc( 0x9C ) ) ).c_str() );
+        ImGui::Text( "%s", String( "PCON = " + int_to_ui_string( processor->direct_acc( 0x87 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "IE   = " + int_to_ui_string( processor->direct_acc( 0xA8 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "IP   = " + int_to_ui_string( processor->direct_acc( 0xB8 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "TCON = " + int_to_ui_string( processor->direct_acc( 0x88 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "TMOD = " + int_to_ui_string( processor->direct_acc( 0x89 ) ) ).c_str() );
+        ImGui::Text( "%s", String( "TH0  = " + int_to_ui_string( processor->direct_acc( 0x9C ) ) ).c_str() );
         ImGui::SameLine();
-        ImGui::Text( String( "TL0  = " + int_to_ui_string( processor->direct_acc( 0x9A ) ) ).c_str() );
-        ImGui::Text( String( "TH1  = " + int_to_ui_string( processor->direct_acc( 0x9D ) ) ).c_str() );
+        ImGui::Text( "%s", String( "TL0  = " + int_to_ui_string( processor->direct_acc( 0x9A ) ) ).c_str() );
+        ImGui::Text( "%s", String( "TH1  = " + int_to_ui_string( processor->direct_acc( 0x9D ) ) ).c_str() );
         ImGui::SameLine();
-        ImGui::Text( String( "TL1  = " + int_to_ui_string( processor->direct_acc( 0x9B ) ) ).c_str() );
+        ImGui::Text( "%s", String( "TL1  = " + int_to_ui_string( processor->direct_acc( 0x9B ) ) ).c_str() );
 
         ImGui::End();
 
@@ -288,7 +288,7 @@ int main() {
                                                                      : String( 1, to_human_readable_ascii( byte ) ) );
                     }
                     line += ascii;
-                    ImGui::Text( line.c_str() );
+                    ImGui::Text( "%s", line.c_str() );
                 }
             }
             ImGui::PopStyleVar();
@@ -312,7 +312,7 @@ int main() {
                                                                      : String( 1, to_human_readable_ascii( byte ) ) );
                     }
                     line += ascii;
-                    ImGui::Text( line.c_str() );
+                    ImGui::Text( "%s", line.c_str() );
                 }
             }
             ImGui::PopStyleVar();
@@ -336,7 +336,7 @@ int main() {
                                                                      : String( 1, to_human_readable_ascii( byte ) ) );
                     }
                     line += ascii;
-                    ImGui::Text( line.c_str() );
+                    ImGui::Text( "%s", line.c_str() );
                 }
             }
             ImGui::PopStyleVar();
@@ -368,13 +368,13 @@ int main() {
                     ImGui::PopID();
                     ImGui::SameLine();
                     if ( code_index == processor->pc ) {
-                        ImGui::TextColored( ImVec4( 1.0f, 1.0f, 0.0f, 1.0f ), line.c_str() );
+                        ImGui::TextColored( ImVec4( 1.0f, 1.0f, 0.0f, 1.0f ), "%s", line.c_str() );
                         if ( last_pc != processor->pc ) {
                             ImGui::SetScrollHereY();
                             last_pc = processor->pc;
                         }
                     } else {
-                        ImGui::Text( line.c_str() );
+                        ImGui::Text( "%s", line.c_str() );
                     }
                 }
             }
@@ -456,14 +456,14 @@ int main() {
                                               : "" );
                     if ( last_global_log_timer.getElapsedTime().asSeconds() < 10.f && i == global_log.size() - 1 ) {
                         if ( to_lower( line ).find( "success" ) != line.npos ) {
-                            ImGui::TextColored( ImVec4( 0.0f, 1.0f, 0.0f, 1.0f ), line.c_str() );
+                            ImGui::TextColored( ImVec4( 0.0f, 1.0f, 0.0f, 1.0f ), "%s", line.c_str() );
                         } else if ( to_lower( line ).find( "fail" ) != line.npos ) {
-                            ImGui::TextColored( ImVec4( 1.0f, 0.0f, 0.0f, 1.0f ), line.c_str() );
+                            ImGui::TextColored( ImVec4( 1.0f, 0.0f, 0.0f, 1.0f ), "%s", line.c_str() );
                         } else {
-                            ImGui::Text( line.c_str() );
+                            ImGui::Text( "%s", line.c_str() );
                         }
                     } else {
-                        ImGui::Text( line.c_str() );
+                        ImGui::Text( "%s", line.c_str() );
                     }
                 }
             }
