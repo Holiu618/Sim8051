@@ -182,7 +182,7 @@ std::map<u8, std::vector<String>> op_code_signatures = {
     { 0x81, { "AJMP", "addr11" } },
     { 0x82, { "ANL", "C", "bit" } },
     { 0x83, { "MOVC", "A", "@A+PC" } },
-    { 0x84, { "DIV", "A", "B" } },
+    { 0x84, { "DIV", "AB" } },
     { 0x85, { "MOV", "direct", "direct" } },
     { 0x86, { "MOV", "direct", "@R0" } },
     { 0x87, { "MOV", "direct", "@R1" } },

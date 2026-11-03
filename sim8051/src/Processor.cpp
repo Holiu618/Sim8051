@@ -399,7 +399,7 @@ void Processor::do_cycle() {
                         log( "Division by zero!" );
                         set_bit_to( overflow_addr, true );
                     } else {
-                        auto rem = a - a / b;
+                        auto rem = a % b;
                         a = a / b;
                         b = rem;
                         set_bit_to( overflow_addr, false );
