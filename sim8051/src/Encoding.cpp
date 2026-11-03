@@ -610,7 +610,7 @@ String to_lower( const String &str ) {
     return tmp;
 }
 
-void compile_assembly( const String &code, std::ostream &output ) {
+bool compile_assembly( const String &code, std::ostream &output ) {
     bool successful = true;
 
     // Prepare maps
@@ -665,9 +665,12 @@ void compile_assembly( const String &code, std::ostream &output ) {
     std::map<String, u16> label_targets; // The collected label positions.
     std::vector<u8> hex; // The final machine code.
     while ( index < code.size() ) {
-        String line = code.substr( index, code.find( "\n", index ) - index + 1 );
+        size_t line_end = code.find( '\n', index );
+        String line = line_end == code.npos ? code.substr( index ) : code.substr( index, line_end - index + 1 );
         index += line.size();
         line_no++;
+
+        try {
 
         // Sanitize the command.
         if ( !line.empty() && line.back() == '\n' )
@@ -692,7 +695,7 @@ void compile_assembly( const String &code, std::ostream &output ) {
         if ( line.empty() )
             continue;
 
-        if ( line.find( ":" ) != line.npos ) {
+        if ( line.find( ".str " ) != 0 && line.find( ".data " ) != 0 && line.find( ":" ) != line.npos ) {
             // Label
 
             if ( line.find( ":" ) != line.size() - 1 ) {
@@ -745,6 +748,7 @@ void compile_assembly( const String &code, std::ostream &output ) {
                         if ( rev_op_codes.find( line ) == rev_op_codes.end() ) {
                             log( "Unknown command/syntax at line " + to_string( line_no ) + "." );
                             successful = false;
+                            continue;
                         }
                     }
                 }
@@ -802,7 +806,7 @@ void compile_assembly( const String &code, std::ostream &output ) {
                                     arg = arg.substr( 1, arg.size() - 2 );
                                 if ( opcode == 0x90 ) {
                                     // "mov dptr" with two bytes
-                                    if ( real_arg1.find_first_not_of( "0123456789abcdef" ) == real_arg1.npos ) {
+                                    if ( arg.find_first_not_of( "0123456789abcdef" ) == arg.npos ) {
                                         // Is direct value
                                         hex.push_back( stoi( arg.substr( 0, 2 ), 0, 16 ) );
                                         hex.push_back( stoi( arg.substr( 2 ), 0, 16 ) );
@@ -845,11 +849,21 @@ void compile_assembly( const String &code, std::ostream &output ) {
                 }
             }
         }
+        } catch ( const std::exception & ) {
+            log( "Syntax error at line " + to_string( line_no ) + ": invalid number or operand." );
+            successful = false;
+        }
     }
 
     // Fill in label targets.
     for ( auto &pair : label_slots8 ) {
-        auto target = label_targets[pair.first];
+        auto target_it = label_targets.find( pair.first );
+        if ( target_it == label_targets.end() ) {
+            log( "Undefined label '" + pair.first + "'." );
+            successful = false;
+            continue;
+        }
+        auto target = target_it->second;
         for ( auto &pos : pair.second ) {
             // Relative offset
             i16 rel_target = target - pos - hex[pos];
@@ -862,7 +876,13 @@ void compile_assembly( const String &code, std::ostream &output ) {
         }
     }
     for ( auto &pair : label_slots11 ) {
-        auto target = label_targets[pair.first];
+        auto target_it = label_targets.find( pair.first );
+        if ( target_it == label_targets.end() ) {
+            log( "Undefined label '" + pair.first + "'." );
+            successful = false;
+            continue;
+        }
+        auto target = target_it->second;
         for ( auto &pos : pair.second ) {
             // Relative jump
             if ( ( target & 0xF800 ) != ( ( pos + 2 ) & 0xF800 ) ) {
@@ -874,7 +894,13 @@ void compile_assembly( const String &code, std::ostream &output ) {
         }
     }
     for ( auto &pair : label_slots16 ) {
-        auto target = label_targets[pair.first];
+        auto target_it = label_targets.find( pair.first );
+        if ( target_it == label_targets.end() ) {
+            log( "Undefined label '" + pair.first + "'." );
+            successful = false;
+            continue;
+        }
+        auto target = target_it->second;
         for ( auto &pos : pair.second ) {
             // Absolute jump
             hex[pos] = ( target >> 8 ) & 0xFF;
@@ -885,5 +911,8 @@ void compile_assembly( const String &code, std::ostream &output ) {
     if ( successful ) {
         encode_hex_file( hex, output );
         log( "Compilation successful." );
+    } else {
+        log( "Compilation failed." );
     }
+    return successful;
 }

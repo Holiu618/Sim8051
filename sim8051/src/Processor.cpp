@@ -57,12 +57,17 @@ bool Processor::load_hex_code( const String &file ) {
     // Load file
     String str;
     size_t line_ctr = 0;
+    try {
     while ( std::getline( stream, str ) ) {
         u8 checksum = 0;
         line_ctr++;
 
-        if ( str.find( ':' ) == str.npos ) {
-            log( "Synatax error at line " + to_string( line_ctr ) );
+        if ( !str.empty() && str.back() == '\r' )
+            str.pop_back();
+        if ( str.empty() )
+            continue;
+        if ( str.find( ':' ) == str.npos || str.size() < 11 ) {
+            log( "Syntax error at line " + to_string( line_ctr ) );
             return false;
         }
         str = str.substr( str.find( ':' ) ); // Ignore leading text.
@@ -74,6 +79,10 @@ bool Processor::load_hex_code( const String &file ) {
             checksum += size + ( addr & 0xff ) + ( addr >> 8 );
             for ( size_t i = 0; i < size; i++ ) {
                 u8 byte = stoi( str.substr( 9 + i * 2, 2 ), 0, 16 );
+                if ( addr + i >= text.size() ) {
+                    log( "Address out of range at line " + to_string( line_ctr ) );
+                    return false;
+                }
                 text[addr + i] = byte;
                 checksum += byte;
             }
@@ -89,6 +98,11 @@ bool Processor::load_hex_code( const String &file ) {
             }
             return true;
         }
+    }
+
+    } catch ( const std::exception & ) {
+        log( "Failed to parse hex file at line " + to_string( line_ctr ) );
+        return false;
     }
 
     log( "File not terminated properly!" );

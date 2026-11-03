@@ -207,7 +207,11 @@ int main() {
         ImGui::Spacing();
         String break_instr_str = to_hex_str( processor->break_instruction );
         if ( ImGui::InputText( "Break instruction", &break_instr_str, ImGuiInputTextFlags_EnterReturnsTrue ) ) {
-            processor->break_instruction = stoi( break_instr_str, 0, 16 );
+            try {
+                processor->break_instruction = stoi( break_instr_str, 0, 16 );
+            } catch ( const std::exception & ) {
+                log( "Invalid break instruction." );
+            }
         }
 
         ImGui::Spacing();
@@ -423,17 +427,19 @@ int main() {
                 auto name_size = editor_asm_filename.find_last_of( "." ) - name_begin;
                 auto filename =
                     editor_hex_file_dir + "/" + editor_asm_filename.substr( name_begin, name_size ) + ".hex";
-                std::ofstream file( filename );
+                std::ostringstream buffer;
+                if ( compile_assembly( editor_content, buffer ) ) {
+                    std::ofstream file( filename );
+                    file << buffer.str();
+                    file.close();
 
-                compile_assembly( editor_content, file );
-                file.close();
-
-                if ( hex_filename == filename ) {
-                    steps_per_frame = 0;
-                    max_speed = false;
-                    use_fix_target_frequency = false;
-                    if ( processor->load_hex_code( hex_filename ) )
-                        decode_instructions( *processor, op_code_indices );
+                    if ( hex_filename == filename ) {
+                        steps_per_frame = 0;
+                        max_speed = false;
+                        use_fix_target_frequency = false;
+                        if ( processor->load_hex_code( hex_filename ) )
+                            decode_instructions( *processor, op_code_indices );
+                    }
                 }
                 should_compile = false;
             }

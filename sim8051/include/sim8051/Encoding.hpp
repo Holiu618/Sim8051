@@ -28,4 +28,4 @@ String to_lower( const String &str );
 /// below) directly.
 /// You will most likely need to wrap bit addresses in parenthesis, as they are treated like normal addresses and
 /// thus need indirection.
-void compile_assembly( const String &code, std::ostream &output );
+bool compile_assembly( const String &code, std::ostream &output );
